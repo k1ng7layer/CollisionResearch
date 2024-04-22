@@ -44,10 +44,10 @@ public class Runner : MonoBehaviour
         bb2.Front = boxMin2.z;
         bb2.Back = boxMax2.z;
 
-        if (PhysicsHelper.IntersectionAABB(ref bb1, ref bb2))
-        {
-            box2.transform.position = bb2.Center;
-        }
+        // if (PhysicsHelper.IntersectionAABB(ref bb1, ref bb2))
+        // {
+        //     box2.transform.position = bb2.Center;
+        // }
        
         // if (PhysicsHelper.SphereVsAABB(boxMin, boxMax, spherePos, sphere.radius, sphereVelocity, out var sphereNewPos))
         // {
@@ -80,7 +80,7 @@ public class Runner : MonoBehaviour
 
         var dir = new Vector3(x, 0f, z);
 
-        box2.transform.position += dir * Time.deltaTime * speed;
+        sphere.transform.position += dir * Time.deltaTime * speed;
         
         _prevPos =  sphere.transform.position;
     }
