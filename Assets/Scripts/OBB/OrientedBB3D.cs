@@ -9,29 +9,70 @@ public class OrientedBB3D : MonoBehaviour
     [SerializeField] private MeshFilter _mesh1;
     [SerializeField] private MeshFilter _mesh2;
 
-    [SerializeField] private Cube _cube;
+    [SerializeField] private Cube _cube1;
+    [SerializeField] private Cube _cube2;
 
 
     private void Awake()
     {
-        _cube = new Cube(Vector3.one);
+        _cube1 = new Cube(Vector3.one);
+        _cube1.Position = _mesh1.transform.position;
+        _cube1.Rotation = _mesh1.transform.rotation;
+
+        _cube2 = new Cube(Vector3.one);
+        _cube2.Position = _mesh2.transform.position;
+        _cube2.Rotation = _mesh2.transform.rotation;
+        
+        
+        var matrix = _mesh1.transform.localToWorldMatrix;
+
+        for (int i = 0; i < 4; i++)
+        {
+            var a = matrix.GetRow(i);
+            Debug.Log($"localToWorldMatrix: {a}");
+        }
+
+        var eeee = _mesh1.transform.rotation * _mesh1.transform.position;
+        
+        Debug.Log($"localToWorldMatrix eeee: {eeee}");
     }
 
     private void Update()
     {
+        // var testVector = new Vector3(0.5f, 0.7f, 1f);
+        // //var unity = _mesh1.transform.TransformVector()
+        //
+        //
+        // return;
+        
+        var x = Input.GetAxisRaw("Horizontal");
+        var z = Input.GetAxisRaw("Vertical");
+
+        var dir = new Vector3(x, 0f, z);
+        
+        Debug.Log($"Movement : {dir}");
+
+        _cube1.Position += dir.normalized * 3f * Time.deltaTime;
+        
         var mtv = Vector3.zero;
 
         if (TestCollision(ref mtv)){}
-            _mesh1.transform.position += new Vector3(mtv.x, mtv.y, mtv.z);
-
-            _cube.Position = _mesh1.transform.position;
-            _cube.Rotation = _mesh1.transform.rotation;
+        _cube1.Position += new Vector3(mtv.x, mtv.y, mtv.z);
+            
+            _mesh1.transform.position = _cube1.Position;
+            _mesh1.transform.rotation = _cube1.Rotation;
+            
+            // _cube1.Position = _mesh1.transform.position;
+            // _cube1.Rotation = _mesh1.transform.rotation;
+            //
+            // _cube2.Position = _mesh2.transform.position;
+            // _cube2.Rotation = _mesh2.transform.rotation;
     }
 
     private bool TestCollision(ref Vector3 mtv)
     {
-        var vertices1 = GetMeshVertices3D(_mesh1.mesh, _mesh1.transform);
-        var vertices2 = GetMeshVertices3D(_mesh2.mesh, _mesh2.transform);
+        var vertices1 = GetMeshVertices3D(_mesh1.mesh, _mesh1.transform, _cube1);
+        var vertices2 = GetMeshVertices3D(_mesh2.mesh, _mesh2.transform, _cube2);
 
         var axes = GetPerpendicularAxes(vertices1, vertices2);
         var minOverlap = float.MaxValue;
@@ -178,14 +219,14 @@ public class OrientedBB3D : MonoBehaviour
         //return GetNormal3D((vertices[index + 1] - vertices[index]).normalized);
     }
 
-    private List<Vector3> GetMeshVertices3D(Mesh mesh, Transform meshTransform)
+    private List<Vector3> GetMeshVertices3D(Mesh mesh, Transform meshTransform, Cube cube)
     {
        // var vertices1 = new List<Vector3>();
         // mesh.GetVertices(vertices1);
         
         //return vertices1;
         var vert = mesh.vertices;
-        vert = RemoveDuplicates(vert, meshTransform);
+        vert = RemoveDuplicates(vert, meshTransform, cube);
         
         return vert.ToList();
     }
@@ -195,13 +236,18 @@ public class OrientedBB3D : MonoBehaviour
         return mesh.bounds.center;
     }
     
-    private Vector3[] RemoveDuplicates(Vector3[] dupArray, Transform transformObj) {
+    private Vector3[] RemoveDuplicates(Vector3[] dupArray, Transform transformObj, Cube cube) {
 
-        for (int j = 0; j < dupArray.Length; j++) {
+        for (int j = 0; j < dupArray.Length; j++)
+        {
+            var cccc = dupArray[j];
+            var cccc2 = dupArray[j];
             dupArray[j] = transformObj.TransformPoint(dupArray[j]);
-            var test = _cube.TransformPointFromLocalToWorldSpace((dupArray[j]));
+            // dupArray[j] = _cube.TransformPointFromLocalToWorldSpace((dupArray[j]));
+            var test  = cube.TransformPointFromLocalToWorldSpace((cccc));
+            var test2 = transformObj.localToWorldMatrix.MultiplyPoint(cccc2);
             
-            Debug.Log($"RemoveDuplicates unity: {dupArray[j]}, me: {test}");
+           //Debug.Log($"RemoveDuplicates unity: {dupArray[j]}, me: {test}, test2: {test2}");
         }
 
         Vector3[] newArray = new Vector3[8];  //change 8 to a variable dependent on shape
