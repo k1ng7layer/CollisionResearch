@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OBB;
 using UnityEngine;
 
 public class OrientedBB3D : MonoBehaviour
 {
     [SerializeField] private MeshFilter _mesh1;
     [SerializeField] private MeshFilter _mesh2;
-    
+
+    [SerializeField] private Cube _cube;
+
+
+    private void Awake()
+    {
+        _cube = new Cube(Vector3.one);
+    }
+
     private void Update()
     {
         var mtv = Vector3.zero;
 
-        if (TestCollision(ref mtv))
+        if (TestCollision(ref mtv)){}
             _mesh1.transform.position += new Vector3(mtv.x, mtv.y, mtv.z);
+
+            _cube.Position = _mesh1.transform.position;
+            _cube.Rotation = _mesh1.transform.rotation;
     }
 
     private bool TestCollision(ref Vector3 mtv)
@@ -187,6 +199,9 @@ public class OrientedBB3D : MonoBehaviour
 
         for (int j = 0; j < dupArray.Length; j++) {
             dupArray[j] = transformObj.TransformPoint(dupArray[j]);
+            var test = _cube.TransformPointFromLocalToWorldSpace((dupArray[j]));
+            
+            Debug.Log($"RemoveDuplicates unity: {dupArray[j]}, me: {test}");
         }
 
         Vector3[] newArray = new Vector3[8];  //change 8 to a variable dependent on shape
