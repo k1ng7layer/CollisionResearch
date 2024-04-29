@@ -83,8 +83,7 @@ namespace OBB
                 new Vector4(-Mathf.Sin(rotEuler.z), Mathf.Cos(rotEuler.z), 0f, 0f),
                 new Vector4(0f, 0f, 1f, 0f), 
                 new Vector4(0f, 0f, 0f, 1f));
-
-
+            
             var transformation = translationMatrix * rotationMatrixY * rotationMatrixX * rotationMatrixZ * scaleMatrix; 
        
             var transformationArr = new float[4, 4];
@@ -97,27 +96,9 @@ namespace OBB
                 transformationArr[1, i] = a.y;
                 transformationArr[2, i] = a.z;
                 transformationArr[3, i] = a.w;
-                //Debug.Log($"localToWorldMatrix: {a}");
             }
-
-
-            var rows = transformationArr.GetUpperBound(0) + 1;
-            var columns = transformationArr.Length / rows;
-          
-            // for (int i = 0; i < rows; i++)
-            // {
-            //     for (int j = 0; j < columns; j++)
-            //     {
-            //         Debug.Log($"localToWorldMatrix array {transformationArr[i, j]}");
-            //     }
-            // }
             
-            
-            //var result = MultiplyMatrixByVector(translationMatrix, new[] { point[0], point[1], point[2], 1 });
-             //var result = transformation.MultiplyPoint(point);
-
-             // var result = MultiplyMatrix(transformationArr, new[] { point[0], point[1], point[2], 1 });
-             var result = MultiplyPoint(transformationArr, point);
+            var result = MultiplyPoint(transformationArr, point);
             return result;
         }
 
