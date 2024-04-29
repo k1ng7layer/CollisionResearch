@@ -89,10 +89,10 @@ namespace OBB
             {
                 var a = transformation.GetRow(i);
 
-                transformationArr[i, 0] = a.x;
-                transformationArr[i, 1] = a.y;
-                transformationArr[i, 2] = a.z;
-                transformationArr[i, 3] = a.w;
+                transformationArr[0, i] = a.x;
+                transformationArr[1, i] = a.y;
+                transformationArr[2, i] = a.z;
+                transformationArr[3, i] = a.w;
                 //Debug.Log($"localToWorldMatrix: {a}");
             }
 
@@ -110,10 +110,10 @@ namespace OBB
             
             
             //var result = MultiplyMatrixByVector(translationMatrix, new[] { point[0], point[1], point[2], 1 });
-             var result = transformation.MultiplyPoint(point);
+             //var result = transformation.MultiplyPoint(point);
 
              // var result = MultiplyMatrix(transformationArr, new[] { point[0], point[1], point[2], 1 });
-             // var result = MultiplyPoint(transformationArr, point);
+             var result = MultiplyPoint(transformationArr, point);
             return result;
         }
 
