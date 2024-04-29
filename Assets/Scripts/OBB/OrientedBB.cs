@@ -1,0 +1,7 @@
+﻿namespace OBB
+{
+    class OrientedBB
+    {
+        
+    }
+}

@@ -25,28 +25,36 @@ namespace OBB
 
                 return new[]
                 {
-                    Position + Rotation * min,
-                    Position + Rotation * new Vector3(max.x, min.y, min.z),
-                    Position + Rotation * new Vector3(min.x, max.y, min.z),
-                    Position + Rotation * new Vector3(max.x, max.y, min.z),
-                    Position + Rotation * new Vector3(min.x, min.y, max.z),
-                    Position + Rotation * new Vector3(max.x, min.y, max.z),
-                    Position + Rotation * new Vector3(min.x, max.y, max.z),
-                    Position + Rotation * max,
+                    // Vector3.zero + Rotation * min,
+                    // Vector3.zero + Rotation * new Vector3(max.x, min.y, min.z),
+                    // Vector3.zero + Rotation * new Vector3(min.x, max.y, min.z),
+                    // Vector3.zero + Rotation * new Vector3(max.x, max.y, min.z),
+                    // Vector3.zero + Rotation * new Vector3(min.x, min.y, max.z),
+                    // Vector3.zero + Rotation * new Vector3(max.x, min.y, max.z),
+                    // Vector3.zero + Rotation * new Vector3(min.x, max.y, max.z),
+                    // Vector3.zero + Rotation * max,
+                    
+                    Vector3.zero + new Vector3(-Size.x, -Size.y, -Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(Size.x, -Size.y, -Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(Size.x, -Size.y, Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(-Size.x, -Size.y, Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(-Size.x, Size.y, -Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(Size.x, Size.y, -Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(Size.x, Size.y, Size.z) * 0.5f,
+                    Vector3.zero + new Vector3(-Size.x, Size.y, Size.z) * 0.5f,
                 };
             }
         }
 
         public Vector3 TransformPointFromLocalToWorldSpace(Vector3 point)
         {
-            var rotEuler = Rotation.eulerAngles;
+            var rotEuler = Rotation.eulerAngles * Mathf.Deg2Rad;
             
             var translationMatrix = new Matrix4x4(
-                new Vector4(1f, 0f, 0f, Position.x), 
-                new Vector4(0f, 1f, 0f, Position.y),
-                new Vector4(0f, 0f, 1f, Position.z), 
-                new Vector4(0f, 0f, 0f, 1f));
-            
+                new Vector4(1f, 0f, 0f, 0f), 
+                new Vector4(0f, 1f, 0f, 0f),
+                new Vector4(0f, 0f, 1f, 0f), 
+                new Vector4(Position.x, Position.y, Position.z, 1f));
             
             var scaleMatrix = new Matrix4x4(
                 new Vector4(1f, 0f, 0f, 0f), 
@@ -56,27 +64,25 @@ namespace OBB
             
             var rotationMatrixX = new Matrix4x4(
                 new Vector4(1f, 0f, 0f, 0f), 
-                new Vector4(0f, Mathf.Cos(rotEuler.x), -Mathf.Sin(rotEuler.x), 0f),
-                new Vector4(0f, Mathf.Sin(rotEuler.x), Mathf.Cos(rotEuler.x), 0f), 
+                new Vector4(0f, Mathf.Cos(rotEuler.x), Mathf.Sin(rotEuler.x), 0f),
+                new Vector4(0f, -Mathf.Sin(rotEuler.x), Mathf.Cos(rotEuler.x), 0f), 
                 new Vector4(0f, 0f, 0f, 1f));
             
             var rotationMatrixY = new Matrix4x4(
-                new Vector4(Mathf.Cos(rotEuler.y), 0f, Mathf.Sin(rotEuler.y), 0f), 
+                new Vector4(Mathf.Cos(rotEuler.y), 0f, -Mathf.Sin(rotEuler.y), 0f), 
                 new Vector4(0f, 1f, 0f, 0f),
-                new Vector4(-Mathf.Sin(rotEuler.y), 0f, Mathf.Cos(rotEuler.y), 0f), 
+                new Vector4(Mathf.Sin(rotEuler.y), 0f, Mathf.Cos(rotEuler.y), 0f), 
                 new Vector4(0f, 0f, 0f, 1f));
             
             var rotationMatrixZ = new Matrix4x4(
-                new Vector4(Mathf.Cos(rotEuler.z), -Mathf.Sin(rotEuler.z), 0f, 0f), 
-                new Vector4(Mathf.Sin(rotEuler.z), Mathf.Cos(rotEuler.z), 0f, 0f),
+                new Vector4(Mathf.Cos(rotEuler.z), Mathf.Sin(rotEuler.z), 0f, 0f), 
+                new Vector4(-Mathf.Sin(rotEuler.z), Mathf.Cos(rotEuler.z), 0f, 0f),
                 new Vector4(0f, 0f, 1f, 0f), 
                 new Vector4(0f, 0f, 0f, 1f));
 
 
-            var transformation = translationMatrix * rotationMatrixX * rotationMatrixY * rotationMatrixZ * scaleMatrix; 
-            //var result = translationMatrix.MultiplyVector(point);
-             //var translationMatrix = GetTranslationMatrix();
-            //
+            var transformation = translationMatrix * rotationMatrixY * rotationMatrixX * rotationMatrixZ * scaleMatrix; 
+       
             var transformationArr = new float[4, 4];
 
             for (int i = 0; i < 4; i++)
@@ -89,13 +95,25 @@ namespace OBB
                 transformationArr[i, 3] = a.w;
                 //Debug.Log($"localToWorldMatrix: {a}");
             }
+
+
+            var rows = transformationArr.GetUpperBound(0) + 1;
+            var columns = transformationArr.Length / rows;
+          
+            // for (int i = 0; i < rows; i++)
+            // {
+            //     for (int j = 0; j < columns; j++)
+            //     {
+            //         Debug.Log($"localToWorldMatrix array {transformationArr[i, j]}");
+            //     }
+            // }
             
             
             //var result = MultiplyMatrixByVector(translationMatrix, new[] { point[0], point[1], point[2], 1 });
-             //var result = transformation.MultiplyPoint(point);
+             var result = transformation.MultiplyPoint(point);
 
              // var result = MultiplyMatrix(transformationArr, new[] { point[0], point[1], point[2], 1 });
-             var result = MultiplyPoint(transformationArr, point);
+             // var result = MultiplyPoint(transformationArr, point);
             return result;
         }
 
@@ -173,7 +191,7 @@ namespace OBB
             res.z =  matrix[0, 2] * point.x +  matrix[1, 2] * point.y +  matrix[2, 2] * point.z +  matrix[3, 2];
             w =  matrix[0, 3] * point.x +  matrix[1, 3] * point.y +  matrix[2, 3] * point.z +  matrix[3, 3];
 
-            w = 1F / w;
+            w = 1f / w;
             res.x *= w;
             res.y *= w;
             res.z *= w;

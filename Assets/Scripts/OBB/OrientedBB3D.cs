@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OBB;
 using UnityEngine;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 
 public class OrientedBB3D : MonoBehaviour
 {
@@ -24,13 +25,14 @@ public class OrientedBB3D : MonoBehaviour
         _cube2.Rotation = _mesh2.transform.rotation;
         
         
-        var matrix = _mesh1.transform.localToWorldMatrix;
-
-        for (int i = 0; i < 4; i++)
-        {
-            var a = matrix.GetRow(i);
-            Debug.Log($"localToWorldMatrix: {a}");
-        }
+        Debug.Log($"_cube1.mesh.size, {_mesh1.mesh.bounds.size}, center: {_mesh1.mesh.bounds.center}");
+        // var matrix = _mesh1.transform.localToWorldMatrix;
+        //
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     var a = matrix.GetRow(i);
+        //     Debug.Log($"localToWorldMatrix UNITY: {a}");
+        // }
 
         var eeee = _mesh1.transform.rotation * _mesh1.transform.position;
         
@@ -39,6 +41,17 @@ public class OrientedBB3D : MonoBehaviour
 
     private void Update()
     {
+        
+        var matrix = _mesh1.transform.localToWorldMatrix;
+        
+
+        for (int i = 0; i < 4; i++)
+        {
+            var a = matrix.GetRow(i);
+            Debug.Log($"localToWorldMatrix UNITY: {a}");
+        }
+        
+        
         // var testVector = new Vector3(0.5f, 0.7f, 1f);
         // //var unity = _mesh1.transform.TransformVector()
         //
@@ -225,6 +238,8 @@ public class OrientedBB3D : MonoBehaviour
         // mesh.GetVertices(vertices1);
         
         //return vertices1;
+        var verts11 = cube.Vertices;
+        verts11 = RemoveDuplicates(verts11, meshTransform, cube);
         var vert = mesh.vertices;
         vert = RemoveDuplicates(vert, meshTransform, cube);
         
@@ -246,8 +261,9 @@ public class OrientedBB3D : MonoBehaviour
             // dupArray[j] = _cube.TransformPointFromLocalToWorldSpace((dupArray[j]));
             var test  = cube.TransformPointFromLocalToWorldSpace((cccc));
             var test2 = transformObj.localToWorldMatrix.MultiplyPoint(cccc2);
-            
-           //Debug.Log($"RemoveDuplicates unity: {dupArray[j]}, me: {test}, test2: {test2}");
+            //
+            if (transformObj == _mesh1.transform)
+                Debug.Log($"RemoveDuplicates unity: {dupArray[j]}, me: {test}, test2: {test2}");
         }
 
         Vector3[] newArray = new Vector3[8];  //change 8 to a variable dependent on shape
